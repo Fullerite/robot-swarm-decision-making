@@ -138,6 +138,8 @@ class RobotVoter:
             if self.connection and self.connection.is_open:
                 self.connection.close()
                 print(f"[!][{self.robot_id}] Connection closed")
+            print(f"--- Robot {self.robot_id} Finished ---")
+            print(f"Final Decision: {self.final_decision}")
 
 
 if __name__ == "__main__":
