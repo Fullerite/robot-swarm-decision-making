@@ -31,7 +31,10 @@ class RobotVoter:
         self.start_signal_received = False
         self.proposal_queue_name = None
         self.final_decision = None
+        self.start_time = None
+        self.end_time = None
         print(f"Robot initialized\nID: {self.robot_id}\nProposal: {self.proposal}\nSwarm Size: {self.swarm_size}")
+        print(20*"-")
 
 
     def _on_start_signal_callback(self, channel, method, properties, body):
@@ -44,6 +47,7 @@ class RobotVoter:
             if msg_type == "start_voting":
                 print(f"[*][{self.robot_id}] Received START signal from barrier")
                 self.start_signal_received = True
+                self.start_time = time.time()
                 channel.stop_consuming()
             else:
                 print(f"[?][{self.robot_id}] Received malformed message: {msg_type}")
@@ -205,6 +209,8 @@ class RobotVoter:
 
             # Process the proposals
             self._process_results()
+
+            self.end_time = time.time()
         except pika.exceptions.AMQPConnectionError as e:
             print(f"[x][{self.robot_id}] Error connecting to {RMQ_HOST}: {e}")
         except KeyboardInterrupt:
@@ -217,6 +223,7 @@ class RobotVoter:
                 print(f"[!][{self.robot_id}] Connection closed")
             print(f"--- Robot {self.robot_id} Finished ---")
             print(f"Final Decision: {self.final_decision}")
+            print(f"[*][{self.robot_id}] Convergence time: {(self.end_time - self.start_time):.4f} seconds")
 
 
 if __name__ == "__main__":
