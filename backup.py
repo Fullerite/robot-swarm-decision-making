@@ -24,6 +24,8 @@ class RobotVoter:
         self.channel = None
         self.queue_name = None
         self.final_decision = None
+        self.start_time = None
+        self.end_time = None
         print(f"Robot initialized\nID: {self.robot_id}\nProposal: {self.proposal}\nSwarm Size: {self.swarm_size}")
 
 
@@ -111,10 +113,10 @@ class RobotVoter:
 
             time.sleep(5)
             proposal_message = json.dumps({
-                    "type": "proposal",
-                    "robot_id": self.robot_id,
-                    "proposal": self.proposal
-                })
+                "type": "proposal",
+                "robot_id": self.robot_id,
+                "proposal": self.proposal
+            })
             self.channel.basic_publish(
                 exchange=EXCHANGE_NAME,
                 routing_key="",
@@ -124,10 +126,14 @@ class RobotVoter:
                 )
             )
             print(f"[<-][{self.robot_id}] Published proposal: {proposal_message}")
+
+            self.start_time = time.time()
             
             self.channel.start_consuming()
 
             self._process_results()
+
+            self.end_time = time.time()
         except pika.exceptions.AMQPConnectionError as e:
             print(f"[x][{self.robot_id}] Error connecting to {RMQ_HOST}: {e}")
         except KeyboardInterrupt:
@@ -140,6 +146,7 @@ class RobotVoter:
                 print(f"[!][{self.robot_id}] Connection closed")
             print(f"--- Robot {self.robot_id} Finished ---")
             print(f"Final Decision: {self.final_decision}")
+            print(f"[*][{self.robot_id}] Convergence time: {(self.end_time - self.start_time):.4f} seconds")
 
 
 if __name__ == "__main__":
