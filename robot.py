@@ -34,11 +34,16 @@ class RobotVoter:
         message = json.loads(body.decode())
         msg_type = message.get("type")
         sender_id = message.get("robot_id")
+
         if msg_type == "ready":
             if sender_id not in self.ready_robots:
                 self.ready_robots.add(sender_id)
                 print(f"[->][{self.robot_id}] Received READY from {sender_id} ({len(self.ready_robots)}/{self.swarm_size})")
         channel.basic_ack(delivery_tag=method.delivery_tag)
+
+        if len(self.ready_robots) == self.swarm_size:
+            print(f"[*][{self.robot_id}] All {self.swarm_size} robots reported ready.")
+            channel.stop_consuming()
 
 
     def _on_message_callback(self, channel, method, properties, body):
@@ -60,7 +65,7 @@ class RobotVoter:
                     print(f"[*][{self.robot_id}] Received all {len(self.received_proposals)}/{self.swarm_size} expected proposals")
                     channel.stop_consuming()
             elif msg_type == "ready":
-                print(f"[i][{self.robot_id}] Ignoring READY message from {sender_id} during proposal phase")
+                print(f"[!][{self.robot_id}] Ignoring READY message from {sender_id} during proposal phase")
             else:
                 print(f"[?][{self.robot_id}] Received malformed message: {message}")
 
@@ -134,12 +139,10 @@ class RobotVoter:
                     body=ready_msg
                 )
                 self.connection.process_data_events(time_limit=0.5)
-                time.sleep(0.05)
+                time.sleep(0.2)
 
             self.channel.basic_cancel(consumer_tag=ready_tag)
             print(f"[*][{self.robot_id}] All {self.swarm_size} robots ready")
-
-            self.channel.queue_purge(queue=self.queue_name)
 
             print(f"[*][{self.robot_id}] Exchanging proposals...")
             self.channel.basic_consume(
@@ -175,10 +178,7 @@ class RobotVoter:
         finally:
             if self.connection and self.connection.is_open:
                 self.connection.close()
-                print(f"[!][{self.robot_id}] Connection closed")
-            print(f"--- Robot {self.robot_id} Finished ---")
-            print(f"Final Decision: {self.final_decision}")
-            print(f"[{self.robot_id}] Convergence time: {(self.end_time - self.start_time):.4f} seconds")
+            print(f"[{self.robot_id}] Final decision: {self.final_decision}. Convergence time: {(self.end_time - self.start_time):.4f} seconds")
 
 
 if __name__ == "__main__":
