@@ -3,3 +3,5 @@ RMQ_USER = "guest"
 RMQ_PASS = "guest"
 EXCHANGE_NAME = "robot_proposals"
 POSSIBLE_PROPOSALS = ['Go Left', 'Go Right', 'Stay Put', 'Go Forward']
+RESULTS_DIR = "results"
+RESULTS_FILENAME = "results.csv"

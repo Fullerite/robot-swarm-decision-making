@@ -5,12 +5,15 @@ import uuid
 import random
 import collections
 import argparse
+import os
 from constants import (
     RMQ_HOST,
     RMQ_USER,
     RMQ_PASS,
     EXCHANGE_NAME,
-    POSSIBLE_PROPOSALS
+    POSSIBLE_PROPOSALS,
+    RESULTS_DIR,
+    RESULTS_FILENAME
 )
 
 
@@ -178,7 +181,15 @@ class RobotVoter:
         finally:
             if self.connection and self.connection.is_open:
                 self.connection.close()
-            print(f"[{self.robot_id}] Final decision: {self.final_decision}. Convergence time: {(self.end_time - self.start_time):.4f} seconds")
+            results_path = os.path.join(RESULTS_DIR, RESULTS_FILENAME)
+            try:
+                with open(results_path, "a") as f:
+                    f.write(f"{self.robot_id},{self.final_decision},{self.end_time - self.start_time:.4f}\n")
+                    f.flush()
+                print(f"--- Robot {self.robot_id} Finished. Appended results. ---")
+            except IOError as e:
+                print(f"[x][{self.robot_id}] Error writing results file {results_path}: {e}")
+
 
 
 if __name__ == "__main__":
@@ -207,4 +218,10 @@ if __name__ == "__main__":
         proposal=args.proposal,
         swarm_size=args.swarm_size
     )
+
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+    results_path = os.path.join(RESULTS_DIR, RESULTS_FILENAME)
+    with open(results_path, "w") as f:
+        f.write("")
+
     robot.run_vote()
