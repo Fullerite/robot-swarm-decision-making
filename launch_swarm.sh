@@ -1,7 +1,10 @@
 #!/bin/bash
 
-SWARM_SIZE=30
+RESULTS_PATH="results/results.csv"
+mkdir -p "$RESULTS_DIR"
+> "$RESULTS_PATH"
 
+SWARM_SIZE=30
 PROPOSALS=("Go Left" "Go Right" "Stay Put" "Go Forward")
 
 for (( i=1; i<=SWARM_SIZE; i++ ))

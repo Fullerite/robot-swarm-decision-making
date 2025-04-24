@@ -219,9 +219,4 @@ if __name__ == "__main__":
         swarm_size=args.swarm_size
     )
 
-    os.makedirs(RESULTS_DIR, exist_ok=True)
-    results_path = os.path.join(RESULTS_DIR, RESULTS_FILENAME)
-    with open(results_path, "w") as f:
-        f.write("")
-
     robot.run_vote()
