@@ -1,7 +1,7 @@
 #!/bin/bash
 
 RESULTS_PATH="results/results.csv"
-mkdir -p "$RESULTS_DIR"
+mkdir -p "results"
 > "$RESULTS_PATH"
 
 SWARM_SIZE=30
