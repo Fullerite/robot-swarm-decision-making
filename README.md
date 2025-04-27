@@ -48,19 +48,19 @@ Then install depencies to `.venv` folder.
     launch_swarm.bat
 ```
 
-- Also you can manually test two specific robots:
+- Also, you can manually test two or more robots:
 
 ```shell
-    python3 robot.py --robot-id "TestBot1" --proposal "Go Left" --swarm-size 5
+    python3 robot.py --robot-id "TestBot1" --proposal "Go Left" --swarm-size 2
 
-    python3 robot.py --robot-id "TestBot2" --proposal "Go Right" --swarm-size 8
+    python3 robot.py --robot-id "TestBot2" --proposal "Go Right" --swarm-size 2
 ```
 
-Better to keep `SWARM_SIZE` less or equal $30$ to more reliability.
+Better to keep `SWARM_SIZE` less or equal to $30$ for more reliability in terms of synchronization.
 
 ## 3. Results
 
-Results will store in the `/results` folder. Check `results.csv` file.
+Results will be stored in the `/results` folder. Check `results.csv` file.
 
 ## 4. Clean up
 
